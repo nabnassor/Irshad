@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /categories/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /cards/{id} {
+      allow read: if true;
+      allow create, delete: if request.auth != null;
+      // admins can edit everything; the public app may only increment tapCount
+      allow update: if request.auth != null
+        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tapCount']);
+    }
+  }
+}

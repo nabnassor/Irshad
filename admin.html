@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إرشاد — لوحة التحكم | Irshad Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--cotton:#FDFCF9;--sky:#A8D8EA;--sky-soft:#E3F3FA;--mint:#B8E6C8;--mint-soft:#EAF8F0;
+--sun:#FFF3B0;--ink:#23507B;--ink-soft:#5B7FA3;--gold:#C9A227;--danger:#D9534F;
+--shadow:0 6px 24px rgba(35,80,123,.08)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cotton);color:var(--ink);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:16px}
+h1,h2,h3{font-family:'Baloo Bhaijaan 2'}
+button{font-family:inherit;cursor:pointer;border:none}
+input,textarea,select{font-family:inherit;font-size:15px;padding:10px 12px;border:1.5px solid #E3DFD2;border-radius:12px;width:100%;background:#fff;color:var(--ink)}
+label{font-size:13px;font-weight:700;color:var(--ink-soft);display:block;margin:10px 0 4px}
+.card{background:#fff;border:1.5px solid var(--gold);border-radius:18px;box-shadow:var(--shadow);padding:22px}
+.btn{padding:11px 20px;border-radius:999px;font-weight:700;font-size:15px}
+.btn.sky{background:var(--sky)}.btn.mint{background:var(--mint)}.btn.plain{background:#EFEDE6}
+.btn.red{background:var(--danger);color:#fff}.btn.sm{padding:6px 14px;font-size:13px}
+/* login */
+#loginView{min-height:100vh;display:grid;place-items:center;padding:20px}
+#loginView .card{width:min(400px,100%);text-align:center}
+/* dash */
+#dash{display:none}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;background:#fff;border-bottom:1px solid #F0EBDD;position:sticky;top:0;z-index:10}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;padding:16px 22px 0}
+.tab{padding:10px 18px;border-radius:999px;background:#EFEDE6;font-weight:700}
+.tab.active{background:var(--sky)}
+main{padding:20px 22px 60px;max-width:1100px;margin:0 auto}
+.pane{display:none}.pane.active{display:block}
+.row{display:flex;gap:14px;flex-wrap:wrap}.row>*{flex:1;min-width:180px}
+.list{display:grid;gap:12px;margin-top:16px}
+.item{background:#fff;border:1.5px solid #EFEAD9;border-radius:14px;padding:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.item .ic{font-size:32px}.item img{width:48px;height:48px;object-fit:contain}
+.item .grow{flex:1;min-width:160px}
+.item .meta{font-size:12px;color:var(--ink-soft)}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.toast{position:fixed;bottom:20px;inset-inline-start:20px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:12px;display:none;z-index:99}
+dialog{border:none;border-radius:18px;box-shadow:var(--shadow);padding:24px;width:min(560px,92vw)}
+dialog::backdrop{background:rgba(35,80,123,.35)}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:14px}
+.stat{background:var(--sky-soft);border-radius:14px;padding:18px;text-align:center}
+.stat b{font-size:30px;display:block}
+.hint{font-size:13px;color:var(--ink-soft)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginView">
+  <div class="card">
+    <h1 style="margin:0 0 4px">إرشاد 🃏</h1>
+    <p class="hint">لوحة التحكم — Admin panel</p>
+    <label>البريد الإلكتروني / Email</label><input id="email" type="email" autocomplete="username">
+    <label>كلمة المرور / Password</label><input id="pass" type="password" autocomplete="current-password">
+    <p id="loginErr" style="color:var(--danger);font-size:13px;min-height:18px"></p>
+    <button class="btn sky" style="width:100%" id="loginBtn">تسجيل الدخول / Sign in</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash">
+  <div class="topbar">
+    <h2 style="margin:0">لوحة تحكم إرشاد</h2>
+    <div><span id="who" class="hint"></span> <button class="btn plain sm" id="logoutBtn">خروج / Sign out</button></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-tab="cards">🃏 البطاقات</button>
+    <button class="tab" data-tab="cats">📁 الأقسام</button>
+    <button class="tab" data-tab="settings">⚙️ الإعدادات</button>
+    <button class="tab" data-tab="io">📦 استيراد / تصدير</button>
+    <button class="tab" data-tab="stats">📊 الإحصائيات</button>
+  </div>
+  <main>
+
+    <!-- CARDS -->
+    <div class="pane active" id="p-cards">
+      <div class="toolbar">
+        <button class="btn mint" id="addCardBtn">＋ بطاقة جديدة</button>
+        <select id="filterCat" style="max-width:220px"></select>
+      </div>
+      <div class="list" id="cardList"></div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="pane" id="p-cats">
+      <div class="toolbar"><button class="btn mint" id="addCatBtn">＋ قسم جديد</button></div>
+      <div class="list" id="catList"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="pane" id="p-settings">
+      <div class="card">
+        <div class="row">
+          <div><label>رقم الهاتف / Phone</label><input id="sPhone" placeholder="95575529"></div>
+          <div><label>البريد / Email</label><input id="sEmail" placeholder="example@gmail.com"></div>
+        </div>
+        <label>رابط ملف PDF لجميع البطاقات / PDF link</label><input id="sPdf" placeholder="https://...">
+        <label>نبذة عن المشروع (عربي)</label><textarea id="sAboutAr" rows="4"></textarea>
+        <label>About the project (English)</label><textarea id="sAboutEn" rows="4"></textarea>
+        <div class="toolbar"><button class="btn sky" id="saveSettings">💾 حفظ الإعدادات</button></div>
+      </div>
+    </div>
+
+    <!-- IMPORT / EXPORT -->
+    <div class="pane" id="p-io">
+      <div class="card">
+        <h3>تصدير / Export</h3>
+        <p class="hint">تنزيل نسخة كاملة من الأقسام والبطاقات والإعدادات بصيغة JSON (نسخة احتياطية).</p>
+        <button class="btn sky" id="exportBtn">⬇️ تصدير JSON</button>
+        <button class="btn plain" id="exportCsvBtn">⬇️ تصدير البطاقات CSV</button>
+        <hr style="border:none;border-top:1px solid #F0EBDD;margin:22px 0">
+        <h3>استيراد / Import</h3>
+        <p class="hint">رفع ملف JSON تم تصديره سابقًا — سيضيف/يحدّث المحتوى ولا يحذف شيئًا.</p>
+        <input type="file" id="importFile" accept=".json">
+        <div class="toolbar"><button class="btn mint" id="importBtn">⬆️ استيراد</button></div>
+        <p id="ioMsg" class="hint"></p>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="pane" id="p-stats">
+      <div class="statgrid" id="statTop"></div>
+      <h3>الأكثر استخدامًا / Most tapped cards</h3>
+      <div class="list" id="statList"></div>
+    </div>
+  </main>
+</div>
+
+<!-- CARD EDITOR -->
+<dialog id="cardDlg">
+  <h3 id="cardDlgTitle">بطاقة</h3>
+  <label>القسم / Category</label><select id="cCat"></select>
+  <div class="row">
+    <div><label>النص (عربي)</label><input id="cAr"></div>
+    <div><label>Label (English)</label><input id="cEn"></div>
+  </div>
+  <div class="row">
+    <div><label>أيقونة (إيموجي)</label><input id="cIcon" placeholder="🥛"></div>
+    <div><label>الترتيب / Order</label><input id="cOrder" type="number" value="1"></div>
+  </div>
+  <label>صورة البطاقة (اختياري) / Image</label><input type="file" id="cImg" accept="image/*">
+  <p class="hint" id="cImgNow"></p>
+  <label>تسجيل صوتي عربي (اختياري) / Arabic audio</label><input type="file" id="cAud" accept="audio/*">
+  <label><input type="checkbox" id="cVisible" checked style="width:auto"> ظاهرة في الموقع / Visible</label>
+  <div class="toolbar">
+    <button class="btn sky" id="cSave">💾 حفظ</button>
+    <button class="btn plain" onclick="cardDlg.close()">إلغاء</button>
+  </div>
+</dialog>
+
+<!-- CATEGORY EDITOR -->
+<dialog id="catDlg">
+  <h3>قسم</h3>
+  <div class="row">
+    <div><label>الاسم (عربي)</label><input id="kAr"></div>
+    <div><label>Name (English)</label><input id="kEn"></div>
+  </div>
+  <div class="row">
+    <div><label>أيقونة</label><input id="kIcon" placeholder="🧃"></div>
+    <div><label>اللون</label><select id="kColor"><option value="sky">أزرق فاتح</option><option value="mint">أخضر نعناعي</option><option value="sun">أصفر فاتح</option></select></div>
+    <div><label>الترتيب</label><input id="kOrder" type="number" value="1"></div>
+  </div>
+  <label><input type="checkbox" id="kVisible" checked style="width:auto"> ظاهر / Visible</label>
+  <div class="toolbar">
+    <button class="btn sky" id="kSave">💾 حفظ</button>
+    <button class="btn plain" onclick="catDlg.close()">إلغاء</button>
+  </div>
+</dialog>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* =============== SAME FIREBASE CONFIG AS index.html =============== */
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY",
+  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+  projectId: "PASTE_YOUR_PROJECT_ID",
+  storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
+  messagingSenderId: "685461208884",
+  appId: "1:685461208884:web:1fa90c664471e324722f61"
+};
+/* ================================================================== */
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut}
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import * as F from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {getStorage, ref, uploadBytes, getDownloadURL}
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app), db = F.getFirestore(app), storage = getStorage(app);
+const $ = id => document.getElementById(id);
+const toast = m => { const t=$("toast"); t.textContent=m; t.style.display="block"; setTimeout(()=>t.style.display="none",2600); };
+
+let cats=[], cards=[], editingCard=null, editingCat=null;
+
+/* ---------- auth ---------- */
+$("loginBtn").onclick = async ()=>{
+  $("loginErr").textContent="";
+  try{ await signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value); }
+  catch(e){ $("loginErr").textContent = "خطأ في البريد أو كلمة المرور / Wrong email or password"; }
+};
+$("logoutBtn").onclick = ()=>signOut(auth);
+onAuthStateChanged(auth, u=>{
+  $("loginView").style.display = u ? "none" : "grid";
+  $("dash").style.display = u ? "block" : "none";
+  if(u){ $("who").textContent = u.email; loadAll(); }
+});
+
+/* ---------- tabs ---------- */
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>{
+  document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("active",x===t));
+  document.querySelectorAll(".pane").forEach(p=>p.classList.remove("active"));
+  $("p-"+t.dataset.tab).classList.add("active");
+  if(t.dataset.tab==="stats") renderStats();
+});
+
+/* ---------- load ---------- */
+async function loadAll(){
+  const [cs,ks,st] = await Promise.all([
+    F.getDocs(F.query(F.collection(db,"categories"), F.orderBy("order"))),
+    F.getDocs(F.query(F.collection(db,"cards"), F.orderBy("order"))),
+    F.getDoc(F.doc(db,"settings","site"))
+  ]);
+  cats = cs.docs.map(d=>({id:d.id,...d.data()}));
+  cards = ks.docs.map(d=>({id:d.id,...d.data()}));
+  if(st.exists()){ const s=st.data();
+    $("sPhone").value=s.phone||""; $("sEmail").value=s.email||""; $("sPdf").value=s.pdfURL||"";
+    $("sAboutAr").value=s.about_ar||""; $("sAboutEn").value=s.about_en||""; }
+  if(cats.length===0){ await seed(); return loadAll(); }
+  renderCats(); renderCards(); fillCatSelects();
+}
+
+/* first-run seed: creates the 9 categories + starter cards in Firestore */
+async function seed(){
+  toast("إعداد أول مرة… First-time setup…");
+  const DC=[["want","🧃","sky","أريد شيئًا","I want something"],["feel","😊","sun","مشاعري","My feelings"],
+  ["act","🎮","mint","الأنشطة","Activities"],["place","🏫","sky","الأماكن","Places"],
+  ["people","👨‍👩‍👧","sun","الأشخاص","People"],["food","🍎","mint","الطعام والشراب","Food & drink"],
+  ["need","🚽","sky","الاحتياجات","Needs"],["calm","🧘","mint","التهدئة","Calming"],
+  ["routine","📅","sun","الروتين اليومي","Daily routine"]];
+  const batch = F.writeBatch(db);
+  DC.forEach((c,i)=>batch.set(F.doc(db,"categories",c[0]),{icon:c[1],color:c[2],ar:c[3],en:c[4],order:i+1,visible:true}));
+  const K=[["want","🥛","أريد ماء","I want water"],["want","🍎","أريد أكل","I want food"],
+  ["want","🚽","أريد دورة المياه","I need the toilet"],["want","😴","أريد أن أرتاح","I want to rest"],
+  ["want","🤝","أحتاج مساعدة","I need help"],["want","🎲","أريد اللعب","I want to play"],
+  ["want","🤗","أريد حضنًا","I want a hug"],["want","🚪","أريد المغادرة","I want to leave"],
+  ["feel","😊","سعيد","Happy"],["feel","😢","حزين","Sad"],["feel","😡","غاضب","Angry"],
+  ["feel","😰","متوتر","Nervous"],["feel","😴","متعب","Tired"],["feel","🤕","أشعر بالألم","I feel pain"],
+  ["feel","😍","أحب هذا","I like this"],["feel","❌","لا أحب هذا","I don't like this"],
+  ["feel","🔊","المكان مزعج وأحتاج للهدوء","It's too loud, I need quiet"],
+  ["calm","🫁","تنفّس ببطء","Breathe slowly"],["calm","🧸","احضن لعبتك","Hug your toy"],
+  ["calm","💧","اشرب ماء","Drink water"],["calm","🎧","استخدم السماعات","Use headphones"],
+  ["calm","🤫","اجلس في ركن الهدوء","Sit in the quiet corner"]];
+  K.forEach((k,i)=>batch.set(F.doc(F.collection(db,"cards")),{cat:k[0],icon:k[1],ar:k[2],en:k[3],order:i+1,visible:true,tapCount:0}));
+  batch.set(F.doc(db,"settings","site"),{phone:"95575529",email:"Nasria.Aldaghatia@gmail.com",pdfURL:"",about_ar:"",about_en:""});
+  await batch.commit();
+}
+
+/* ---------- render lists ---------- */
+function fillCatSelects(){
+  const opts = cats.map(c=>`<option value="${c.id}">${c.icon} ${c.ar}</option>`).join("");
+  $("cCat").innerHTML = opts;
+  $("filterCat").innerHTML = `<option value="">كل الأقسام / All</option>`+opts;
+}
+function media(c){ return c.imageURL?`<img src="${c.imageURL}">`:`<span class="ic">${c.icon||"🖼️"}</span>`; }
+function renderCards(){
+  const f = $("filterCat").value;
+  const list = cards.filter(c=>!f||c.cat===f);
+  $("cardList").innerHTML = list.map(c=>`
+    <div class="item">${media(c)}
+      <div class="grow"><b>${c.ar}</b> — ${c.en||""}
+        <div class="meta">${(cats.find(k=>k.id===c.cat)||{}).ar||c.cat} · ترتيب ${c.order||0} · ${c.visible===false?"مخفية 🚫":"ظاهرة ✅"} · 👆 ${c.tapCount||0}</div></div>
+      <button class="btn plain sm" data-edit="${c.id}">✏️ تعديل</button>
+      <button class="btn red sm" data-del="${c.id}">🗑️ حذف</button>
+    </div>`).join("") || `<p class="hint">لا توجد بطاقات.</p>`;
+}
+function renderCats(){
+  $("catList").innerHTML = cats.map(c=>`
+    <div class="item"><span class="ic">${c.icon}</span>
+      <div class="grow"><b>${c.ar}</b> — ${c.en||""}<div class="meta">ترتيب ${c.order||0} · ${c.visible===false?"مخفي 🚫":"ظاهر ✅"}</div></div>
+      <button class="btn plain sm" data-editcat="${c.id}">✏️ تعديل</button>
+      <button class="btn red sm" data-delcat="${c.id}">🗑️ حذف</button>
+    </div>`).join("");
+}
+$("filterCat").onchange = renderCards;
+
+/* ---------- card editor ---------- */
+const cardDlg = $("cardDlg"), catDlg = $("catDlg");
+window.cardDlg = cardDlg; window.catDlg = catDlg;
+$("addCardBtn").onclick = ()=>{ editingCard=null; $("cardDlgTitle").textContent="بطاقة جديدة";
+  ["cAr","cEn","cIcon"].forEach(i=>$(i).value=""); $("cOrder").value=cards.length+1;
+  $("cVisible").checked=true; $("cImg").value=""; $("cAud").value=""; $("cImgNow").textContent=""; cardDlg.showModal(); };
+document.addEventListener("click", async e=>{
+  const ed=e.target.closest("[data-edit]"); if(ed){ const c=cards.find(x=>x.id===ed.dataset.edit); editingCard=c;
+    $("cardDlgTitle").textContent="تعديل بطاقة"; $("cCat").value=c.cat; $("cAr").value=c.ar||""; $("cEn").value=c.en||"";
+    $("cIcon").value=c.icon||""; $("cOrder").value=c.order||1; $("cVisible").checked=c.visible!==false;
+    $("cImg").value=""; $("cAud").value=""; $("cImgNow").textContent=c.imageURL?"يوجد صورة مرفوعة حاليًا ✅":""; cardDlg.showModal(); }
+  const dl=e.target.closest("[data-del]"); if(dl && confirm("حذف هذه البطاقة؟ / Delete this card?")){
+    await F.deleteDoc(F.doc(db,"cards",dl.dataset.del)); toast("تم الحذف ✅"); loadAll(); }
+  const ek=e.target.closest("[data-editcat]"); if(ek){ const c=cats.find(x=>x.id===ek.dataset.editcat); editingCat=c;
+    $("kAr").value=c.ar; $("kEn").value=c.en||""; $("kIcon").value=c.icon||""; $("kColor").value=c.color||"sky";
+    $("kOrder").value=c.order||1; $("kVisible").checked=c.visible!==false; catDlg.showModal(); }
+  const dk=e.target.closest("[data-delcat]"); if(dk && confirm("حذف هذا القسم؟ (لن تُحذف بطاقاته تلقائيًا)")){
+    await F.deleteDoc(F.doc(db,"categories",dk.dataset.delcat)); toast("تم الحذف ✅"); loadAll(); }
+});
+async function uploadFile(input, path){
+  const f = input.files[0]; if(!f) return null;
+  const r = ref(storage, `${path}/${Date.now()}_${f.name}`);
+  await uploadBytes(r, f); return await getDownloadURL(r);
+}
+$("cSave").onclick = async ()=>{
+  $("cSave").disabled=true;
+  try{
+    const data = {cat:$("cCat").value, ar:$("cAr").value.trim(), en:$("cEn").value.trim(),
+      icon:$("cIcon").value.trim(), order:Number($("cOrder").value)||1, visible:$("cVisible").checked};
+    const img = await uploadFile($("cImg"), "cards/images"); if(img) data.imageURL=img;
+    const aud = await uploadFile($("cAud"), "cards/audio");  if(aud) data.audioURL=aud;
+    if(editingCard) await F.updateDoc(F.doc(db,"cards",editingCard.id), data);
+    else await F.addDoc(F.collection(db,"cards"), {...data, tapCount:0});
+    cardDlg.close(); toast("تم الحفظ ✅"); loadAll();
+  }catch(e){ alert("خطأ: "+e.message); }
+  $("cSave").disabled=false;
+};
+
+/* ---------- category editor ---------- */
+$("addCatBtn").onclick = ()=>{ editingCat=null; ["kAr","kEn","kIcon"].forEach(i=>$(i).value="");
+  $("kOrder").value=cats.length+1; $("kVisible").checked=true; catDlg.showModal(); };
+$("kSave").onclick = async ()=>{
+  const data={ar:$("kAr").value.trim(), en:$("kEn").value.trim(), icon:$("kIcon").value.trim(),
+    color:$("kColor").value, order:Number($("kOrder").value)||1, visible:$("kVisible").checked};
+  if(editingCat) await F.updateDoc(F.doc(db,"categories",editingCat.id), data);
+  else await F.setDoc(F.doc(db,"categories", data.en.toLowerCase().replace(/\s+/g,"-")||("cat"+Date.now())), data);
+  catDlg.close(); toast("تم الحفظ ✅"); loadAll();
+};
+
+/* ---------- settings ---------- */
+$("saveSettings").onclick = async ()=>{
+  await F.setDoc(F.doc(db,"settings","site"), {phone:$("sPhone").value.trim(), email:$("sEmail").value.trim(),
+    pdfURL:$("sPdf").value.trim(), about_ar:$("sAboutAr").value, about_en:$("sAboutEn").value}, {merge:true});
+  toast("تم حفظ الإعدادات ✅");
+};
+
+/* ---------- import / export ---------- */
+$("exportBtn").onclick = ()=>{
+  const data = {exportedAt:new Date().toISOString(), categories:cats, cards,
+    settings:{phone:$("sPhone").value, email:$("sEmail").value, pdfURL:$("sPdf").value,
+              about_ar:$("sAboutAr").value, about_en:$("sAboutEn").value}};
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
+  a.download="irshad-backup.json"; a.click();
+};
+$("exportCsvBtn").onclick = ()=>{
+  const rows=[["id","category","arabic","english","icon","order","visible","tapCount","imageURL"]];
+  cards.forEach(c=>rows.push([c.id,c.cat,c.ar,c.en||"",c.icon||"",c.order||"",c.visible!==false,c.tapCount||0,c.imageURL||""]));
+  const csv="\uFEFF"+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="irshad-cards.csv"; a.click();
+};
+$("importBtn").onclick = async ()=>{
+  const f=$("importFile").files[0]; if(!f){ $("ioMsg").textContent="اختر ملف JSON أولًا."; return; }
+  try{
+    const data = JSON.parse(await f.text());
+    const batch = F.writeBatch(db);
+    (data.categories||[]).forEach(c=>{ const {id,...rest}=c; batch.set(F.doc(db,"categories",id||("cat"+Math.random().toString(36).slice(2))), rest, {merge:true}); });
+    (data.cards||[]).forEach(c=>{ const {id,...rest}=c;
+      if(id && !String(id).startsWith("d")) batch.set(F.doc(db,"cards",id), rest, {merge:true});
+      else batch.set(F.doc(F.collection(db,"cards")), rest); });
+    if(data.settings) batch.set(F.doc(db,"settings","site"), data.settings, {merge:true});
+    await batch.commit();
+    $("ioMsg").textContent="تم الاستيراد بنجاح ✅"; loadAll();
+  }catch(e){ $("ioMsg").textContent="ملف غير صالح: "+e.message; }
+};
+
+/* ---------- stats ---------- */
+function renderStats(){
+  const total = cards.reduce((s,c)=>s+(c.tapCount||0),0);
+  $("statTop").innerHTML = `
+    <div class="stat"><b>${cards.length}</b>بطاقة</div>
+    <div class="stat"><b>${cats.length}</b>قسم</div>
+    <div class="stat"><b>${total}</b>إجمالي الضغطات</div>`;
+  const top=[...cards].sort((a,b)=>(b.tapCount||0)-(a.tapCount||0)).slice(0,10);
+  $("statList").innerHTML = top.map(c=>`
+    <div class="item">${media(c)}<div class="grow"><b>${c.ar}</b></div><b>👆 ${c.tapCount||0}</b></div>`).join("");
+}
+</script>
+</body>
+</html>

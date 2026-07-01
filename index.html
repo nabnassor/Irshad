@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>إرشاد — مع إرشاد بطلنا ينال عوناً وسداد</title>
+<meta name="description" content="منصة تواصل بصرية تساعد أطفال طيف التوحد على التعبير عن احتياجاتهم بالصور.">
+<meta name="theme-color" content="#FDFCF9">
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cotton:#FDFCF9; --sky:#A8D8EA; --sky-soft:#E3F3FA; --mint:#B8E6C8; --mint-soft:#EAF8F0;
+  --sun:#FFF3B0; --sun-soft:#FFFAE0; --ink:#23507B; --ink-soft:#5B7FA3;
+  --gold:#C9A227; --card:#FFFFFF; --shadow:0 6px 24px rgba(35,80,123,.08);
+  --radius:28px; --tile:132px;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{margin:0; padding:0; background:var(--cotton); color:var(--ink);
+  font-family:'IBM Plex Sans Arabic','Baloo Bhaijaan 2',sans-serif; font-size:18px}
+h1,h2,h3,.display{font-family:'Baloo Bhaijaan 2',cursive; font-weight:800}
+button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit}
+img{max-width:100%}
+:focus-visible{outline:4px solid var(--sky); outline-offset:3px; border-radius:12px}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky; top:0; z-index:40; display:flex; align-items:center; justify-content:space-between;
+  padding:14px 20px; background:rgba(253,252,249,.92); backdrop-filter:blur(8px);
+  border-bottom:1px solid #F0EBDD}
+.brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--ink)}
+.brand .mark{width:46px;height:46px;border-radius:14px;background:var(--card);border:1.5px solid var(--gold);
+  display:grid;place-items:center;font-size:24px}
+.brand .name{font-family:'Baloo Bhaijaan 2';font-size:26px;font-weight:800;line-height:1}
+.brand .slogan{font-size:12px;color:var(--ink-soft)}
+.lang-btn{background:var(--sky-soft); border:1.5px solid var(--sky); color:var(--ink);
+  padding:10px 18px; border-radius:999px; font-weight:700; font-size:16px}
+
+/* ---------- layout ---------- */
+main{max-width:980px; margin:0 auto; padding:24px 20px 130px}
+.view{display:none; animation:fade .25s ease}
+.view.active{display:block}
+@keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+@media (prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important} }
+
+/* ---------- home ---------- */
+.hero{text-align:center; padding:36px 10px 10px}
+.hero .cards-motif{display:flex; justify-content:center; gap:-10px; margin-bottom:18px}
+.hero h1{font-size:clamp(34px,7vw,56px); margin:.2em 0}
+.hero p{color:var(--ink-soft); font-size:20px; max-width:560px; margin:0 auto 34px}
+.start-btn{display:block; width:min(440px,100%); margin:0 auto; padding:26px;
+  background:var(--sky); color:var(--ink); font-family:'Baloo Bhaijaan 2'; font-size:30px; font-weight:800;
+  border-radius:var(--radius); box-shadow:var(--shadow); transition:transform .15s}
+.start-btn:active{transform:scale(.97)}
+.home-links{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin-top:34px}
+.home-link{background:var(--card); border:1.5px solid #F0EBDD; border-radius:22px; padding:20px;
+  display:flex; align-items:center; gap:14px; font-weight:700; font-size:18px; text-align:start; box-shadow:var(--shadow)}
+.home-link .ic{font-size:30px}
+
+/* ---------- gold framed card (signature) ---------- */
+.gcard{background:var(--card); border-radius:22px; border:1.5px solid var(--gold);
+  box-shadow:var(--shadow); position:relative; overflow:hidden}
+.gcard::after{content:""; position:absolute; inset:7px; border:1px solid rgba(201,162,39,.35); border-radius:16px; pointer-events:none}
+
+/* ---------- grids ---------- */
+.section-title{display:flex; align-items:center; gap:12px; margin:8px 0 20px}
+.section-title h2{font-size:clamp(26px,5vw,36px); margin:0}
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(var(--tile),1fr)); gap:18px}
+.tile{min-height:var(--tile); padding:18px 10px; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:10px; text-align:center; transition:transform .12s}
+.tile:active{transform:scale(.95)}
+.tile .ic{font-size:52px; line-height:1}
+.tile .lbl{font-weight:700; font-size:17px; line-height:1.35}
+.tile img.thumb{width:76px; height:76px; object-fit:contain}
+.tile.cat-sky{background:var(--sky-soft)} .tile.cat-mint{background:var(--mint-soft)} .tile.cat-sun{background:var(--sun-soft)}
+
+/* ---------- fullscreen card ---------- */
+.overlay{position:fixed; inset:0; z-index:60; background:rgba(35,80,123,.35); display:none;
+  align-items:center; justify-content:center; padding:20px}
+.overlay.open{display:flex}
+.bigcard{width:min(420px,94vw); padding:34px 26px; text-align:center; border-radius:30px}
+.bigcard .ic{font-size:min(38vw,150px); line-height:1.1}
+.bigcard img{width:min(60vw,240px); height:auto; max-height:44vh; object-fit:contain}
+.bigcard .word{font-family:'Baloo Bhaijaan 2'; font-size:clamp(28px,7vw,40px); font-weight:800; margin-top:14px}
+.bigcard .actions{display:flex; gap:12px; justify-content:center; margin-top:22px; flex-wrap:wrap}
+.pill{padding:14px 22px; border-radius:999px; font-weight:700; font-size:17px}
+.pill.sky{background:var(--sky)} .pill.mint{background:var(--mint)} .pill.plain{background:#EFEDE6}
+
+/* ---------- calming ---------- */
+.breath-wrap{display:flex; flex-direction:column; align-items:center; gap:26px; padding:30px 0}
+.breath{width:210px; height:210px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #DFF2FB, var(--sky));
+  display:grid; place-items:center; font-family:'Baloo Bhaijaan 2'; font-size:24px; font-weight:800; color:var(--ink);
+  box-shadow:0 0 0 18px rgba(168,216,234,.25); transition:transform 4s ease-in-out}
+.breath.in{transform:scale(1.35)} .breath.out{transform:scale(1)}
+@media (prefers-reduced-motion:reduce){ .breath{transition:none} }
+
+/* ---------- parents / about ---------- */
+.panel{padding:26px; margin-bottom:18px}
+.panel h3{margin-top:0; font-size:24px}
+.panel p, .panel li{color:#3D5F82; line-height:1.9}
+.contact-row{display:flex; gap:12px; flex-wrap:wrap; margin-top:10px}
+
+/* ---------- bottom nav ---------- */
+.bottomnav{position:fixed; bottom:0; inset-inline:0; z-index:40; display:flex; justify-content:center; gap:14px;
+  padding:14px 20px calc(14px + env(safe-area-inset-bottom)); background:rgba(253,252,249,.95);
+  border-top:1px solid #F0EBDD; backdrop-filter:blur(8px)}
+.navb{display:flex; flex-direction:column; align-items:center; gap:4px; min-width:86px; padding:10px 14px;
+  border-radius:18px; font-weight:700; font-size:14px}
+.navb .ic{font-size:26px}
+.navb.active{background:var(--sun-soft); border:1.5px solid var(--sun)}
+.back-fab{position:fixed; z-index:41; bottom:calc(96px + env(safe-area-inset-bottom)); inset-inline-start:18px;
+  width:64px;height:64px;border-radius:50%; background:var(--mint); font-size:28px; box-shadow:var(--shadow); display:none}
+.back-fab.show{display:block}
+html[dir="ltr"] .back-fab .arr{display:inline-block; transform:scaleX(-1)}
+.offline-note{background:var(--sun-soft); border:1.5px solid var(--sun); border-radius:14px; padding:10px 16px;
+  font-size:14px; margin-bottom:16px; display:none}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="#home">
+    <span class="mark">🃏</span>
+    <span><span class="name" data-i="brand">إرشاد</span><br>
+    <span class="slogan" data-i="slogan">مع إرشاد بطلنا ينال عوناً وسداد</span></span>
+  </a>
+  <button class="lang-btn" id="langBtn" aria-label="Switch language">English</button>
+</header>
+
+<main>
+  <div class="offline-note" id="offlineNote"></div>
+
+  <!-- HOME -->
+  <section class="view active" id="v-home">
+    <div class="hero">
+      <h1 data-i="heroTitle">أهلاً بأبطالنا 💙</h1>
+      <p data-i="heroText">منصة تساعد أطفال طيف التوحد على التعبير عن احتياجاتهم ومشاعرهم باستخدام الصور، بطريقة سهلة وهادئة.</p>
+      <button class="start-btn" id="startBtn" data-i="start">🟦 ابدأ التواصل</button>
+      <div class="home-links">
+        <button class="home-link" data-go="calm"><span class="ic">🧘</span><span data-i="calmTitle">ركن التهدئة</span></button>
+        <button class="home-link" data-go="parents"><span class="ic">👨‍👩‍👧</span><span data-i="parentsTitle">للأهل والمعلمين</span></button>
+        <button class="home-link" data-go="about"><span class="ic">💡</span><span data-i="aboutTitle">عن مشروع إرشاد</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="view" id="v-cats">
+    <div class="section-title"><h2 data-i="pickCat">ماذا تريد أن تقول؟</h2></div>
+    <div class="grid" id="catGrid"></div>
+  </section>
+
+  <!-- CARDS -->
+  <section class="view" id="v-cards">
+    <div class="section-title"><span class="ic" id="catIcon" style="font-size:36px"></span><h2 id="catTitle"></h2></div>
+    <div class="grid" id="cardGrid"></div>
+  </section>
+
+  <!-- CALM -->
+  <section class="view" id="v-calm">
+    <div class="section-title"><h2 data-i="calmTitle">ركن التهدئة</h2></div>
+    <div class="gcard panel breath-wrap">
+      <div class="breath" id="breath" data-i="breatheStart">اضغط للبدء</div>
+      <button class="pill sky" id="breathBtn" data-i="breatheBtn">تمرين التنفس</button>
+    </div>
+    <div class="grid" id="calmGrid" style="margin-top:20px"></div>
+  </section>
+
+  <!-- PARENTS -->
+  <section class="view" id="v-parents">
+    <div class="section-title"><h2 data-i="parentsTitle">للأهل والمعلمين</h2></div>
+    <div class="gcard panel">
+      <h3 data-i="howTitle">📖 طريقة الاستخدام</h3>
+      <ul id="guideList"></ul>
+    </div>
+    <div class="gcard panel">
+      <h3 data-i="pdfTitle">📥 تحميل جميع البطاقات</h3>
+      <p data-i="pdfText">يمكنكم تحميل البطاقات وطباعتها لاستخدامها كقلادة أو حلقة مفاتيح.</p>
+      <a class="pill mint" id="pdfLink" style="display:inline-block;text-decoration:none" href="#" data-i="pdfBtn">تحميل ملف PDF</a>
+    </div>
+    <div class="gcard panel">
+      <h3 data-i="contactTitle">📞 للتواصل</h3>
+      <div class="contact-row">
+        <a class="pill sky" id="phoneLink" style="text-decoration:none" href="tel:+96895575529">☎️ 95575529</a>
+        <a class="pill plain" id="mailLink" style="text-decoration:none" href="mailto:Nasria.Aldaghatia@gmail.com">✉️ Email</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="view" id="v-about">
+    <div class="section-title"><h2 data-i="aboutTitle">عن مشروع إرشاد</h2></div>
+    <div class="gcard panel"><p id="aboutText"></p></div>
+  </section>
+</main>
+
+<!-- fullscreen card overlay -->
+<div class="overlay" id="overlay" role="dialog" aria-modal="true">
+  <div class="gcard bigcard">
+    <div id="bigMedia"></div>
+    <div class="word" id="bigWord"></div>
+    <div class="actions">
+      <button class="pill sky" id="sayBtn">🔊 <span data-i="say">استمع</span></button>
+      <a class="pill mint" id="dlBtn" style="text-decoration:none" download>⬇️ <span data-i="download">تحميل</span></a>
+      <button class="pill plain" id="closeBtn" data-i="close">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<button class="back-fab" id="backFab" aria-label="Back"><span class="arr">➡️</span></button>
+
+<nav class="bottomnav">
+  <button class="navb" data-go="home"><span class="ic">🏠</span><span data-i="navHome">الرئيسية</span></button>
+  <button class="navb" data-go="cats"><span class="ic">💬</span><span data-i="navTalk">التواصل</span></button>
+  <button class="navb" data-go="calm"><span class="ic">🧘</span><span data-i="navCalm">التهدئة</span></button>
+</nav>
+
+<script type="module">
+/* =============== FIREBASE CONFIG — paste your full config here =============== */
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_API_KEY",
+  authDomain: "PASTE_YOUR_PROJECT.firebaseapp.com",
+  projectId: "PASTE_YOUR_PROJECT_ID",
+  storageBucket: "PASTE_YOUR_PROJECT.appspot.com",
+  messagingSenderId: "685461208884",
+  appId: "1:685461208884:web:1fa90c664471e324722f61"
+};
+/* ============================================================================= */
+
+/* ---------- i18n ---------- */
+const T = {
+  ar: {brand:"إرشاد", slogan:"مع إرشاد بطلنا ينال عوناً وسداد", heroTitle:"أهلاً بأبطالنا 💙",
+    heroText:"منصة تساعد أطفال طيف التوحد على التعبير عن احتياجاتهم ومشاعرهم باستخدام الصور، بطريقة سهلة وهادئة.",
+    start:"🟦 ابدأ التواصل", pickCat:"ماذا تريد أن تقول؟", calmTitle:"ركن التهدئة", parentsTitle:"للأهل والمعلمين",
+    aboutTitle:"عن مشروع إرشاد", navHome:"الرئيسية", navTalk:"التواصل", navCalm:"التهدئة",
+    say:"استمع", download:"تحميل", close:"إغلاق", breatheStart:"اضغط للبدء", breatheBtn:"تمرين التنفس",
+    breatheIn:"خذ شهيقًا 🌬️", breatheHold:"توقّف…", breatheOut:"أخرج الزفير 💨",
+    howTitle:"📖 طريقة الاستخدام", pdfTitle:"📥 تحميل جميع البطاقات",
+    pdfText:"يمكنكم تحميل البطاقات وطباعتها لاستخدامها كقلادة أو حلقة مفاتيح.", pdfBtn:"تحميل ملف PDF",
+    contactTitle:"📞 للتواصل", offline:"يعمل الموقع الآن بالبطاقات الأساسية.",
+    guide:["أعطِ الطفل الجهاز أو القلادة عند الوصول.","دع الطفل يضغط على الصورة التي تعبّر عن حاجته.","استجب بهدوء لما اختاره الطفل.","استخدم ركن التهدئة عند الانزعاج الحسي.","أعد القلادة عند المغادرة ليتم تعقيمها."],
+    about:"يهدف مشروع «إرشاد» إلى توفير وسيلة تواصل بصرية وملموسة تساعد الأطفال من ذوي اضطراب طيف التوحد على التعبير عن احتياجاتهم في الأماكن المزدحمة، عبر بطاقات بصرية على شكل قلادة تُعار في المراكز الصحية والمجمعات التجارية، مع دليل رقمي عبر رمز QR. المشروع منخفض التكلفة، مستدام، ويعاد استخدام قلاداته بعد تعقيمها."},
+  en: {brand:"Irshad", slogan:"With Irshad, our hero finds help and guidance", heroTitle:"Welcome, heroes 💙",
+    heroText:"A platform that helps children on the autism spectrum express their needs and feelings using pictures — simply and calmly.",
+    start:"🟦 Start communicating", pickCat:"What would you like to say?", calmTitle:"Calm corner", parentsTitle:"For parents & teachers",
+    aboutTitle:"About Irshad", navHome:"Home", navTalk:"Talk", navCalm:"Calm",
+    say:"Listen", download:"Download", close:"Close", breatheStart:"Tap to start", breatheBtn:"Breathing exercise",
+    breatheIn:"Breathe in 🌬️", breatheHold:"Hold…", breatheOut:"Breathe out 💨",
+    howTitle:"📖 How to use", pdfTitle:"📥 Download all cards",
+    pdfText:"You can download and print the cards to use as a necklace or keychain.", pdfBtn:"Download PDF",
+    contactTitle:"📞 Contact us", offline:"Running with the built-in starter cards.",
+    guide:["Hand the child the device or necklace on arrival.","Let the child tap the picture that shows their need.","Respond calmly to what the child chose.","Use the calm corner during sensory overload.","Return the necklace before leaving so it can be sanitized."],
+    about:"“Irshad” provides a tangible, screen-free and digital visual communication tool that helps autistic children express their needs in crowded places — picture cards worn as a necklace, lent at health centers and malls, with a digital guide via QR code. Low-cost, sustainable, and reusable after sanitization."}
+};
+
+/* ---------- default content (works before admin uploads anything) ---------- */
+const DEFAULT_CATS = [
+  {id:"want",    icon:"🧃", color:"sky",  ar:"أريد شيئًا",     en:"I want something", order:1},
+  {id:"feel",    icon:"😊", color:"sun",  ar:"مشاعري",         en:"My feelings", order:2},
+  {id:"act",     icon:"🎮", color:"mint", ar:"الأنشطة",        en:"Activities", order:3},
+  {id:"place",   icon:"🏫", color:"sky",  ar:"الأماكن",        en:"Places", order:4},
+  {id:"people",  icon:"👨‍👩‍👧", color:"sun", ar:"الأشخاص",     en:"People", order:5},
+  {id:"food",    icon:"🍎", color:"mint", ar:"الطعام والشراب", en:"Food & drink", order:6},
+  {id:"need",    icon:"🚽", color:"sky",  ar:"الاحتياجات",     en:"Needs", order:7},
+  {id:"calm",    icon:"🧘", color:"mint", ar:"التهدئة",        en:"Calming", order:8},
+  {id:"routine", icon:"📅", color:"sun",  ar:"الروتين اليومي", en:"Daily routine", order:9},
+];
+const DEFAULT_CARDS = [
+  {cat:"want", icon:"🥛", ar:"أريد ماء", en:"I want water"},
+  {cat:"want", icon:"🍎", ar:"أريد أكل", en:"I want food"},
+  {cat:"want", icon:"🚽", ar:"أريد دورة المياه", en:"I need the toilet"},
+  {cat:"want", icon:"😴", ar:"أريد أن أرتاح", en:"I want to rest"},
+  {cat:"want", icon:"🤝", ar:"أحتاج مساعدة", en:"I need help"},
+  {cat:"want", icon:"🎲", ar:"أريد اللعب", en:"I want to play"},
+  {cat:"want", icon:"🤗", ar:"أريد حضنًا", en:"I want a hug"},
+  {cat:"want", icon:"🚪", ar:"أريد المغادرة", en:"I want to leave"},
+  {cat:"feel", icon:"😊", ar:"سعيد", en:"Happy"},
+  {cat:"feel", icon:"😢", ar:"حزين", en:"Sad"},
+  {cat:"feel", icon:"😡", ar:"غاضب", en:"Angry"},
+  {cat:"feel", icon:"😰", ar:"متوتر", en:"Nervous"},
+  {cat:"feel", icon:"😴", ar:"متعب", en:"Tired"},
+  {cat:"feel", icon:"🤕", ar:"أشعر بالألم", en:"I feel pain"},
+  {cat:"feel", icon:"😍", ar:"أحب هذا", en:"I like this"},
+  {cat:"feel", icon:"❌", ar:"لا أحب هذا", en:"I don't like this"},
+  {cat:"feel", icon:"🔊", ar:"المكان مزعج وأحتاج للهدوء", en:"It's too loud, I need quiet"},
+  {cat:"act",  icon:"🎨", ar:"أريد الرسم", en:"I want to draw"},
+  {cat:"act",  icon:"📚", ar:"أريد قصة", en:"I want a story"},
+  {cat:"act",  icon:"⚽", ar:"أريد الكرة", en:"I want the ball"},
+  {cat:"act",  icon:"🧩", ar:"أريد الألغاز", en:"I want puzzles"},
+  {cat:"place",icon:"🏠", ar:"أريد البيت", en:"I want to go home"},
+  {cat:"place",icon:"🏫", ar:"المدرسة", en:"School"},
+  {cat:"place",icon:"🏥", ar:"العيادة", en:"Clinic"},
+  {cat:"place",icon:"🌳", ar:"الحديقة", en:"Park"},
+  {cat:"people",icon:"👩", ar:"ماما", en:"Mom"},
+  {cat:"people",icon:"👨", ar:"بابا", en:"Dad"},
+  {cat:"people",icon:"🧑‍⚕️", ar:"الطبيب", en:"Doctor"},
+  {cat:"people",icon:"🧑‍🏫", ar:"المعلم", en:"Teacher"},
+  {cat:"food", icon:"💧", ar:"ماء", en:"Water"},
+  {cat:"food", icon:"🥪", ar:"ساندويتش", en:"Sandwich"},
+  {cat:"food", icon:"🍌", ar:"موز", en:"Banana"},
+  {cat:"food", icon:"🥛", ar:"حليب", en:"Milk"},
+  {cat:"need", icon:"🚽", ar:"دورة المياه", en:"Toilet"},
+  {cat:"need", icon:"🧼", ar:"غسل اليدين", en:"Wash hands"},
+  {cat:"need", icon:"🧥", ar:"أشعر بالبرد", en:"I'm cold"},
+  {cat:"need", icon:"🥵", ar:"أشعر بالحر", en:"I'm hot"},
+  {cat:"calm", icon:"🫁", ar:"تنفّس ببطء", en:"Breathe slowly"},
+  {cat:"calm", icon:"🧸", ar:"احضن لعبتك", en:"Hug your toy"},
+  {cat:"calm", icon:"💧", ar:"اشرب ماء", en:"Drink water"},
+  {cat:"calm", icon:"🎧", ar:"استخدم السماعات", en:"Use headphones"},
+  {cat:"calm", icon:"🤫", ar:"اجلس في ركن الهدوء", en:"Sit in the quiet corner"},
+  {cat:"routine",icon:"🌅", ar:"الاستيقاظ", en:"Wake up"},
+  {cat:"routine",icon:"🪥", ar:"تنظيف الأسنان", en:"Brush teeth"},
+  {cat:"routine",icon:"🍽️", ar:"وقت الطعام", en:"Meal time"},
+  {cat:"routine",icon:"🛁", ar:"الاستحمام", en:"Bath time"},
+  {cat:"routine",icon:"🌙", ar:"وقت النوم", en:"Sleep time"},
+].map((c,i)=>({id:"d"+i, order:i+1, ...c}));
+
+/* ---------- state ---------- */
+let lang = "ar";
+try{ lang = localStorage.getItem("irshad-lang") || "ar"; }catch(e){}
+let cats = DEFAULT_CATS.slice(), cards = DEFAULT_CARDS.slice(), settings = {};
+let db=null, fs=null, currentCat=null;
+
+/* ---------- firebase (graceful) ---------- */
+async function initFirebase(){
+  if(firebaseConfig.apiKey.startsWith("PASTE")) { showOffline(); return; }
+  try{
+    const {initializeApp} = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+    fs = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+    db = fs.getFirestore(initializeApp(firebaseConfig));
+    const [cs, ks, st] = await Promise.all([
+      fs.getDocs(fs.query(fs.collection(db,"categories"), fs.orderBy("order"))),
+      fs.getDocs(fs.query(fs.collection(db,"cards"), fs.orderBy("order"))),
+      fs.getDoc(fs.doc(db,"settings","site"))
+    ]);
+    if(!cs.empty) cats = cs.docs.map(d=>({id:d.id, ...d.data()})).filter(c=>c.visible!==false);
+    if(!ks.empty) cards = ks.docs.map(d=>({id:d.id, ...d.data()})).filter(c=>c.visible!==false);
+    if(st.exists()) settings = st.data();
+    applySettings(); renderCats(); renderCalm();
+  }catch(e){ console.warn("Firestore unavailable, using defaults", e); showOffline(); }
+}
+function showOffline(){ const n=document.getElementById("offlineNote"); n.textContent=T[lang].offline; n.style.display="block"; }
+function bumpTap(card){
+  if(!db || String(card.id).startsWith("d")) return;
+  try{ fs.updateDoc(fs.doc(db,"cards",card.id), {tapCount: fs.increment(1)}).catch(()=>{}); }catch(e){}
+}
+
+/* ---------- i18n render ---------- */
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang==="ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i]").forEach(el=>{ const k=el.dataset.i; if(T[lang][k]) el.textContent = T[lang][k]; });
+  document.getElementById("langBtn").textContent = lang==="ar" ? "English" : "العربية";
+  document.getElementById("guideList").innerHTML = T[lang].guide.map(g=>`<li>${g}</li>`).join("");
+  document.getElementById("aboutText").textContent = settings["about_"+lang] || T[lang].about;
+  document.title = lang==="ar" ? "إرشاد — مع إرشاد بطلنا ينال عوناً وسداد" : "Irshad — Visual communication for autistic children";
+  renderCats(); if(currentCat) renderCards(currentCat); renderCalm();
+}
+function applySettings(){
+  if(settings.pdfURL) document.getElementById("pdfLink").href = settings.pdfURL;
+  if(settings.phone){ const p=document.getElementById("phoneLink"); p.href="tel:"+settings.phone; p.textContent="☎️ "+settings.phone; }
+  if(settings.email) document.getElementById("mailLink").href = "mailto:"+settings.email;
+}
+
+/* ---------- rendering ---------- */
+const L = c => lang==="ar" ? (c.ar||c.labelAr||"") : (c.en||c.labelEn||c.ar||c.labelAr||"");
+function cardMediaHTML(c, big){
+  if(c.imageURL) return `<img src="${c.imageURL}" alt="${L(c)}" ${big?"":'class="thumb"'} loading="lazy">`;
+  return `<span class="ic">${c.icon||"🖼️"}</span>`;
+}
+function renderCats(){
+  document.getElementById("catGrid").innerHTML = cats.map(c=>`
+    <button class="tile gcard cat-${c.color||"sky"}" data-cat="${c.id}">
+      <span class="ic">${c.icon||"📁"}</span><span class="lbl">${L(c)}</span>
+    </button>`).join("");
+}
+function renderCards(catId){
+  currentCat = catId;
+  const cat = cats.find(c=>c.id===catId); if(!cat) return;
+  document.getElementById("catIcon").textContent = cat.icon||"";
+  document.getElementById("catTitle").textContent = L(cat);
+  const list = cards.filter(k=>(k.cat||k.categoryId)===catId);
+  document.getElementById("cardGrid").innerHTML = list.map(k=>`
+    <button class="tile gcard" data-card="${k.id}">${cardMediaHTML(k)}<span class="lbl">${L(k)}</span></button>`).join("");
+}
+function renderCalm(){
+  const list = cards.filter(k=>(k.cat||k.categoryId)==="calm");
+  document.getElementById("calmGrid").innerHTML = list.map(k=>`
+    <button class="tile gcard cat-mint" data-card="${k.id}">${cardMediaHTML(k)}<span class="lbl">${L(k)}</span></button>`).join("");
+}
+
+/* ---------- fullscreen card ---------- */
+const overlay = document.getElementById("overlay");
+let openCard = null;
+function showCard(id){
+  const c = cards.find(k=>String(k.id)===String(id)); if(!c) return;
+  openCard = c;
+  document.getElementById("bigMedia").innerHTML = cardMediaHTML(c, true);
+  document.getElementById("bigWord").textContent = L(c);
+  const dl = document.getElementById("dlBtn");
+  if(c.imageURL){ dl.style.display="inline-block"; dl.href=c.imageURL; } else dl.style.display="none";
+  overlay.classList.add("open");
+  bumpTap(c); say(c);
+}
+function say(c){
+  const url = lang==="ar" ? c.audioURL : (c.audioURLEn||c.audioURL);
+  if(url){ new Audio(url).play().catch(()=>{}); return; }
+  try{
+    const u = new SpeechSynthesisUtterance(L(c));
+    u.lang = lang==="ar" ? "ar" : "en"; u.rate = .85;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- navigation ---------- */
+const views = {home:"v-home", cats:"v-cats", cards:"v-cards", calm:"v-calm", parents:"v-parents", about:"v-about"};
+function go(v){
+  Object.values(views).forEach(id=>document.getElementById(id).classList.remove("active"));
+  document.getElementById(views[v]||"v-home").classList.add("active");
+  document.querySelectorAll(".navb").forEach(b=>b.classList.toggle("active", b.dataset.go===v));
+  document.getElementById("backFab").classList.toggle("show", v==="cards");
+  window.scrollTo({top:0});
+}
+
+/* ---------- breathing ---------- */
+let breathing=false, breathTimer=null;
+function breathCycle(){
+  const b = document.getElementById("breath");
+  const steps=[["breatheIn","in",4000],["breatheHold","in",3000],["breatheOut","out",5000]];
+  let i=0;
+  const step=()=>{ if(!breathing) return;
+    const [k,cls,ms]=steps[i%3];
+    b.textContent=T[lang][k]; b.classList.remove("in","out"); b.classList.add(cls);
+    i++; breathTimer=setTimeout(step, ms); };
+  step();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", e=>{
+  const go1 = e.target.closest("[data-go]"); if(go1){ go(go1.dataset.go); return; }
+  const cat = e.target.closest("[data-cat]"); if(cat){ renderCards(cat.dataset.cat); go("cards"); return; }
+  const crd = e.target.closest("[data-card]"); if(crd){ showCard(crd.dataset.card); return; }
+});
+document.getElementById("startBtn").onclick = ()=>go("cats");
+document.getElementById("backFab").onclick = ()=>go("cats");
+document.getElementById("closeBtn").onclick = ()=>{ overlay.classList.remove("open"); try{speechSynthesis.cancel()}catch(e){} };
+overlay.onclick = e=>{ if(e.target===overlay) overlay.classList.remove("open"); };
+document.getElementById("sayBtn").onclick = ()=>{ if(openCard) say(openCard); };
+document.getElementById("langBtn").onclick = ()=>{
+  lang = lang==="ar" ? "en" : "ar";
+  try{ localStorage.setItem("irshad-lang", lang); }catch(e){}
+  applyLang();
+};
+document.getElementById("breathBtn").onclick = ()=>{
+  breathing = !breathing;
+  const b=document.getElementById("breath");
+  if(breathing){ document.getElementById("breathBtn").textContent = lang==="ar"?"إيقاف":"Stop"; breathCycle(); }
+  else{ clearTimeout(breathTimer); b.classList.remove("in","out"); b.textContent=T[lang].breatheStart;
+        document.getElementById("breathBtn").textContent=T[lang].breatheBtn; }
+};
+
+/* ---------- boot ---------- */
+applyLang(); renderCats(); renderCalm(); go("home"); initFirebase();
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
+</script>
+</body>
+</html>
