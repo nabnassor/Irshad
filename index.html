@@ -403,14 +403,52 @@ function showCard(id){
   overlay.classList.add("open");
   bumpTap(c); say(c);
 }
+/* --- speech: robust voice loading + Arabic voice selection --- */
+let VOICES = [];
+function refreshVoices(){ try{ VOICES = speechSynthesis.getVoices() || []; }catch(e){ VOICES=[]; } }
+if("speechSynthesis" in window){
+  refreshVoices();
+  speechSynthesis.onvoiceschanged = refreshVoices;      // Chrome loads voices async
+  setTimeout(refreshVoices, 400);                        // extra safety on slow devices
+}
+function pickVoice(code){                                // code: "ar" | "en"
+  if(!VOICES.length) refreshVoices();
+  const lc = v => (v.lang||"").toLowerCase().replace("_","-");
+  // 1. exact-language local voices first, 2. any voice of that language,
+  // 3. voices whose *name* mentions Arabic (some Androids mislabel lang)
+  return VOICES.find(v => lc(v).startsWith(code) && v.localService)
+      || VOICES.find(v => lc(v).startsWith(code))
+      || (code==="ar" ? VOICES.find(v => /arab|عرب|majed|naayf|laila|hoda|tarik/i.test(v.name)) : null)
+      || null;
+}
+let warnedNoArabic = false;
 function say(c){
   const url = lang==="ar" ? c.audioURL : (c.audioURLEn||c.audioURL);
   if(url){ new Audio(url).play().catch(()=>{}); return; }
+  if(!("speechSynthesis" in window)) return;
   try{
     const u = new SpeechSynthesisUtterance(L(c));
-    u.lang = lang==="ar" ? "ar" : "en"; u.rate = .85;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
+    const v = pickVoice(lang==="ar" ? "ar" : "en");
+    if(v){ u.voice = v; u.lang = v.lang; }
+    else u.lang = lang==="ar" ? "ar-SA" : "en-US";
+    u.rate = .8; u.pitch = 1;
+    if(lang==="ar" && !v && VOICES.length && !warnedNoArabic){
+      warnedNoArabic = true;
+      showToast(lang==="ar"
+        ? "لا يوجد صوت عربي مثبت على هذا الجهاز — يمكن رفع تسجيلات صوتية من لوحة التحكم"
+        : "No Arabic voice installed on this device — you can upload recordings from the admin panel");
+    }
+    speechSynthesis.cancel();
+    setTimeout(()=>speechSynthesis.speak(u), 80);        // avoids Chrome cancel/speak race
   }catch(e){}
+}
+function showToast(msg){
+  let t = document.getElementById("toast");
+  if(!t){ t = document.createElement("div"); t.id="toast";
+    t.style.cssText="position:fixed;bottom:110px;inset-inline:16px;margin:auto;max-width:420px;background:#23507B;color:#fff;padding:12px 18px;border-radius:14px;font-size:14px;z-index:99;text-align:center";
+    document.body.appendChild(t); }
+  t.textContent = msg; t.style.display="block";
+  setTimeout(()=>t.style.display="none", 5000);
 }
 
 /* ---------- navigation ---------- */
